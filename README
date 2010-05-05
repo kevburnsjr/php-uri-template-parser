@@ -1,0 +1,19 @@
+PHP URI Template Parser
+A feature-complete URI Template Parser class for PHP >= 5.2.3
+http://lab.kevburnsjr.com/php-uri-template-parser
+
+As of this writing, URI Template is still very much a moving target.
+The latest version of the URI Template Spec can be found at
+http://tools.ietf.org/html/draft-gregorio-uritemplate-04
+
+Usage examples can be found in the tests file.
+
+This library will prefer usability over modularity.
+ * The parser class will ideally be contained within a single file.
+
+This library will prefer brevity and clarity over verbosity.
+ * The parser class will ideally require few inline comments.
+
+This library is intended for wide-spread use.
+ * Ample support materials will ideally be made available to potential users.
+ * The parser will ideally be compatible with all versions of PHP >= 5.2.3
