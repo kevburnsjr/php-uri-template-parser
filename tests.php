@@ -46,7 +46,7 @@
 	);
 ?>
 	<h2>Vars for standard tests</h2>
-	<pre><?=print_r($std_vars)?></pre>
+	<pre><?=print_r($std_vars,1)?></pre>
 <?
 	foreach($std_tests as $title => $tests) {
 ?>
