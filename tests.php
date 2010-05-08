@@ -26,7 +26,10 @@
 		'keys'  => array('key1'=>'val1','key2'=>'val2'),
 		'path'  => '/foo/bar',
 		'x'     => '1024',
-		'y'     => '768'
+		'y'     => '768',
+        'foo'   => 'fred',
+        'foo2'  => "That's right!",
+        'base'  => "http://example.com/home/"
 	);
 	$std_tests = array(
 		"Simple expansion with comma-separated values" => array(
@@ -42,17 +45,92 @@
 			'{keys}'          => "key1,val1,key2,val2",
 			'{keys*}'         => "key1,val1,key2,val2",
 			'{keys+}'         => "keys.key1,val1,keys.key2,val2",
-		)
+		),
+        "Reserved expansion with comma-separated values" => array(
+            '{+var}'          => "value",
+            '{+hello}'        => "Hello%20World!",
+            '{+path}/here'    => "/foo/bar/here",
+            '{+path,x}/here'  => "/foo/bar,1024/here",
+            '{+path}{x}/here' => "/foo/bar1024/here",
+            '{+empty}/here'   => "/here",
+            '{+undef}/here'   => "/here",
+            '{+list}'         => "val1,val2,val3",
+            '{+list*}'        => "val1,val2,val3",
+            '{+list+}'        => "list.val1,list.val2,list.val3",
+            '{+keys}'         => "key1,val1,key2,val2",
+            '{+keys*}'        => "key1,val1,key2,val2",
+            '{+keys+}'        => "keys.key1,val1,keys.key2,val2"
+        ),
+        "Path-style parameters, semicolon-prefixed" => array(
+            '{;x,y}'          => ";x=1024;y=768",
+            '{;x,y,empty}'    => ";x=1024;y=768;empty",
+            '{;x,y,undef}'    => ";x=1024;y=768",
+            '{;list}'         => ";val1,val2,val3",
+            '{;list*}'        => ";val1;val2;val3",
+            '{;list+}'        => ";list=val1;list=val2;list=val3",
+            '{;keys}'         => ";key1,val1,key2,val2",
+            '{;keys*}'        => ";key1=val1;key2=val2",
+            '{;keys+}'        => ";keys.key1=val1;keys.key2=val2"
+        ),
+        "Form-style parameters, ampersand-separated" => array(
+            '{?x,y}'          => "?x=1024&y=768",
+            '{?x,y,empty}'    => "?x=1024&y=768&empty=",
+            '{?x,y,undef}'    => "?x=1024&y=768",
+            '{?list}'         => "?list=val1,val2,val3",
+            '{?list*}'        => "?val1&val2&val3",
+            '{?list+}'        => "?list=val1&list=val2&list=val3",
+            '{?keys}'         => "?keys=key1,val1,key2,val2",
+            '{?keys*}'        => "?key1=val1&key2=val2",
+            '{?keys+}'        => "?keys.key1=val1&keys.key2=val2"
+        ),
+        "Hierarchical path segments, slash-separated" => array(
+
+            '{/var}'          => "/value",
+            '{/var,empty}'    => "/value/",
+            '{/var,undef}'    => "/value",
+            '{/list}'         => "/val1,val2,val3",
+            '{/list*}'        => "/val1/val2/val3",
+            '{/list*,x}'      => "/val1/val2/val3/1024",
+            '{/list+}'        => "/list.val1/list.val2/list.val3",
+            '{/keys}'         => "/key1,val1,key2,val2",
+            '{/keys*}'        => "/key1/val1/key2/val2",
+            '{/keys+}'        => "/keys.key1/val1/keys.key2/val2"
+        ),
+        "Label expansion, dot-prefixed" => array(
+            'X{.var}'         => "X.value",
+            'X{.empty}'       => "X.",
+            'X{.undef}'       => "X",
+            'X{.list}'        => "X.val1,val2,val3",
+            'X{.list*}'       => "X.val1.val2.val3",
+            'X{.list*,x}'     => "X.val1.val2.val3.1024",
+            'X{.list+}'       => "X.list.val1.list.val2.list.val3",
+            'X{.keys}'        => "X.key1,val1,key2,val2",
+            'X{.keys*}'       => "X.key1.val1.key2.val2",
+            'X{.keys+}'       => "X.keys.key1.val1.keys.key2.val2"
+        ),
+        "Simple Expansion" => array(
+            '{foo}'           => "fred",
+            '{foo,foo}'       => "fred,fred",
+            '{bar,foo}'       => "fred",
+            '{bar=wilma}'     => "wilma"
+        ),
+        "Reserved  Expansion" => array(
+            '{foo2}'          => "That%27s%20right%21",
+            '{+foo2}'         => "That's%20right!",
+            '{base}index'     => "http%3A%2F%2Fexample.com%2Fhome%2Findex",
+            '{+base}index'    => "http://example.com/home/index"
+        )
 	);
-?>
-	<h2>Vars for standard tests</h2>
-	<pre><?=print_r($std_vars,1)?></pre>
-<?
+    
+    $tests_run = 0;
+    $tests_passed = 0;
+    ob_start();
 	foreach($std_tests as $title => $tests) {
 ?>
 		<h2><?=$title?></h2>
 		<ul id="<?=md5($title)?>" class="test-results">
 		<? foreach($tests as $uri_template => $expected) {
+            $tests_run++;
 			$parser = new URI_Template_Parser($uri_template);
 			$output = $msg = '';
 			try {
@@ -60,48 +138,25 @@
 			} catch(Exception $e) {
 				$msg = "Error: ". $e->getMessage();
 			}
-			$class = $output == $expected ? 'pass' : 'fail';
+            if($output == $expected) {
+                $tests_passed++;
+                $class = 'pass';
+            } else {
+                $class = 'fail';
+            }
 			$output = $output?$output:$msg;
 			renderTest($class, '', $uri_template, $output, $expected);
 		} ?>
 		</ul>
-<?} 
-
-	$template_tests = array(
-		'{var}' => array(
-			array(
-				array('var'=>'value'),
-				'value'
-			)
-		),
-		'{hello}' => array(
-			array(
-				array('hello'=>"hello world!"),
-				"hello%20world%21"
-			)
-		)
-	);
-	
-	foreach($template_tests as $uri_template => $tests) {
-	$parser = new URI_Template_Parser($uri_template);
+<? } 
+    $test_results = ob_get_contents();
+    ob_end_clean();
+    $all_passed = $tests_passed == $tests_run;
 ?>
-	<h2><?=$uri_template?></h2>
-	<ul id="<?=md5($uri_template)?>" class="test-results">
-		<? foreach($tests as $n => $io) {
-			list($input, $expected) = $io;
-			$output = $msg = '';
-			try {
-				$output = $parser->expand($input);
-			} catch(Exception $e) {
-				$msg = "Error: ". $e->getMessage();
-			}
-			$class = $output == $expected ? 'pass' : 'fail';
-			$output = $output?$output:$msg;
-			$id = md5($uri_template)."-".$n;
-			renderTest($class, $id, $input, $output, $expected);
-		} ?>
-	</ul>
-<? } ?>
+    <p style="font-size: 30px; padding: 10px 20px; margin: 0 0 20px; float: left; color: #fff; background: #<?=($all_passed?'009900':'990000')?>"><strong><?=$tests_passed?></strong> out of <strong><?=$tests_run?></strong> pass (<strong><?=($tests_run-$tests_passed)?></strong> failures)</p>
+	<h2 style="clear: left;">Vars for standard tests</h2>
+	<pre><?=print_r($std_vars,1)?></pre>
+    <?=$test_results?>
 	</div>
 	
 <style>
