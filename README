@@ -11,7 +11,9 @@ http://tools.ietf.org/html/draft-gregorio-uritemplate-04
 require 'URI_Template_Parser.class.php';
 
 $template = new URI_Template_Parser("/users/{userid}");
-$user_url = $parser->expand(array('userid' => 5));
+$url = $parser->expand(array('userid' => 5));
+
+# /users/5
 
 
 Additional usage examples can be found in the tests file.
