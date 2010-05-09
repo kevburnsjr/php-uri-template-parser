@@ -13,8 +13,6 @@ require 'URI_Template_Parser.class.php';
 $template = new URI_Template_Parser("/users/{userid}");
 $url = $parser->expand(array('userid' => 5));
 
-# /users/5
-
 
 Additional usage examples can be found in the tests file.
 
