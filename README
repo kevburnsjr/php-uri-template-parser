@@ -6,17 +6,13 @@ As of this writing, URI Template is still very much a moving target.
 The latest version of the URI Template Spec can be found at
 http://tools.ietf.org/html/draft-gregorio-uritemplate-04
 
-Usage:
 
+# Usage
 require 'URI_Template_Parser.class.php';
 
-$uri_template = "http://twitter.com/users/{userid}";
-$parser = new URI_Template_Parser($uri_template);
+$template = new URI_Template_Parser("/users/{userid}");
+$user_url = $parser->expand(array('userid' => 5));
 
-$user_id = 5
-$user_url = $parser->expand($userid);
-
-$satisfaction += $beer->drink();
 
 Additional usage examples can be found in the tests file.
 
