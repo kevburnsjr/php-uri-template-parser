@@ -2,6 +2,8 @@ PHP URI Template Parser
 A feature-complete URI Template Parser class for PHP >= 5.2.3
 http://lab.kevburnsjr.com/php-uri-template-parser
 
+Dual licensed under the MIT or GPL Version 2 licenses.
+
 As of this writing, URI Template is still very much a moving target.
 The latest version of the URI Template Spec can be found at
 http://tools.ietf.org/html/draft-gregorio-uritemplate-04
