@@ -13,28 +13,28 @@ Class URI_Template_Parser {
     public static $sub_delims_pct = array('%21','%24','%26','%27','%28','%29','%2A','%2B','%2C','%3B','%3D') ;
     public static $reserved;
     public static $reserved_pct;
-	
-	public function __construct($template) {
+    
+    public function __construct($template) {
         self::$reserved     = array_merge(self::$gen_delims, self::$sub_delims);
         self::$reserved_pct = array_merge(self::$gen_delims_pct, self::$sub_delims_pct);
-		$this->template = $template;
-	}
-	
-	public function expand($data) {
+        $this->template = $template;
+    }
+    
+    public function expand($data) {
     
         // Format incoming data
-		switch(gettype($data)) {
-			case "boolean":
-			case "integer":
-			case "double":
-			case "string":
-			case "object":
-				$data = (array)$data;
-			break;
-		}
+        switch(gettype($data)) {
+            case "boolean":
+            case "integer":
+            case "double":
+            case "string":
+            case "object":
+                $data = (array)$data;
+            break;
+        }
         
         // Resolve template vars
-		preg_match_all('/\{([^\}]*)\}/', $this->template, $em);
+        preg_match_all('/\{([^\}]*)\}/', $this->template, $em);
         
         foreach($em[1] as $i => $bare_expression) {
             preg_match('/^([\+\;\?\/\.]{1})?(.*)$/', $bare_expression, $lm);
@@ -55,9 +55,9 @@ Class URI_Template_Parser {
             }
             
             // Add processing flags
-			$exp->reserved = false;
-			$exp->prefix = '';
-			$exp->delimiter = ',';
+            $exp->reserved = false;
+            $exp->prefix = '';
+            $exp->delimiter = ',';
             switch($exp->operator) {
                 case '+':
                     $exp->reserved = 'true';
@@ -83,7 +83,7 @@ Class URI_Template_Parser {
         }
         
         // Expansion
-		$this->expansion = $this->template;
+        $this->expansion = $this->template;
         
         foreach($expressions as $exp) {
             $part = $exp->prefix;
@@ -112,11 +112,11 @@ Class URI_Template_Parser {
             if(!$exp->one_var_defined) $part = '';
             $this->expansion = str_replace($exp->expression, $part, $this->expansion);
         }
-		
-		return $this->expansion;
-	}
+        
+        return $this->expansion;
+    }
     
-	private function val_from_var($var, $exp) {
+    private function val_from_var($var, $exp) {
         $val = '';
         if(is_array($var->data)) {
             $i = 0;
@@ -167,16 +167,16 @@ Class URI_Template_Parser {
             }
             $val .= rawurlencode($var->data);
             if($exp->operator == '+') {
-                $val = str_replace( self::$reserved_pct,self::$reserved, $val);
+                $val = str_replace(self::$reserved_pct, self::$reserved, $val);
             }
         }
         return $val;
-	}
-	
-	public function match($uri) { }
-	
-	public function __toString() {
-		return $this->template;
-	}
-	
+    }
+    
+    public function match($uri) { }
+    
+    public function __toString() {
+        return $this->template;
+    }
+    
 }
