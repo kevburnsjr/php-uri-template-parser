@@ -35,7 +35,8 @@ Class URI_Template_Parser {
         
         // Resolve template vars
 		preg_match_all('/\{([^\}]*)\}/', $this->template, $em);
-        
+
+        $expressions = array();
         foreach($em[1] as $i => $bare_expression) {
             preg_match('/^([\+\;\?\/\.]{1})?(.*)$/', $bare_expression, $lm);
             $exp = new StdClass();
